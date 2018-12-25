@@ -1,49 +1,81 @@
-import Taro, { Component } from '@tarojs/taro'
-import { View, Button, Text } from '@tarojs/components'
-import { connect } from '@tarojs/redux'
+import Taro, {Component} from '@tarojs/taro'
+import {View, Swiper, SwiperItem, Image, Text} from '@tarojs/components'
+import {AtSearchBar, AtNoticebar} from 'taro-ui'
+import {connect} from '@tarojs/redux';
+import './index.less';
 
-import { add, minus, asyncAdd } from '../../actions/counter'
-
-import './index.less'
-
-
-@connect(({ counter }) => ({
-  counter
-}), (dispatch) => ({
-  add () {
-    dispatch(add())
-  },
-  dec () {
-    dispatch(minus())
-  },
-  asyncAdd () {
-    dispatch(asyncAdd())
-  }
-}))
+@connect(({home}) => ({...home}))
 class Index extends Component {
 
-    config = {
-    navigationBarTitleText: '首页'
+  config = {
+    navigationBarTitleText: "安安实验",
+    backgroundColor: "#f0f0f0",
+    backgroundTextStyle: "light"
+  };
+
+  componentWillMount() {
+    const {dispatch} = this.props;
+    dispatch({
+      type: 'home/getMenuList',
+    });
+  };
+
+  onPullDownRefresh() {
+    const {dispatch} = this.props;
+    dispatch({
+      type: 'home/getMenuList',
+    });
   }
 
-  componentWillReceiveProps (nextProps) {
-    console.log(this.props, nextProps)
-  }
+  render() {
+    const {menuList} = this.props;
 
-  componentWillUnmount () { }
+    const menuitem = menuList.map((item, index) => {
+      return <View
+        className='menu-item'
+        key={String(index)}
+      >
+        <Image src={item.logo}></Image>
+        <Text>{item.name}</Text>
+      </View>
+    });
 
-  componentDidShow () { }
-
-  componentDidHide () { }
-
-  render () {
     return (
-      <View className='index'>
-        <Button className='add_btn' onClick={this.props.add}>+</Button>
-        <Button className='dec_btn' onClick={this.props.dec}>-</Button>
-        <Button className='dec_btn' onClick={this.props.asyncAdd}>async</Button>
-        <View><Text>{this.props.counter.num}</Text></View>
-        <View><Text>Hello, World</Text></View>
+      <View>
+        <AtSearchBar
+          actionName='搜索'
+          onActionClick={this.onActionClick.bind(this)}
+        />
+        <View style={{paddingTop: '10px'}}>
+          <Swiper
+            indicatorColor='#999'
+            indicatorActiveColor='#333'
+            circular
+            indicatorDots
+            autoplay>
+            <SwiperItem>
+              <View className='img-wrap'>
+                <Image src='https://static.ananlab.com/wx/banner.png'/>
+              </View>
+            </SwiperItem>
+            <SwiperItem>
+              <View className='img-wrap'>
+                <Image src='https://static.ananlab.com/wx/banner.png'/>
+              </View>
+            </SwiperItem>
+            <SwiperItem>
+              <View className='img-wrap'>
+                <Image src='https://static.ananlab.com/wx/banner.png'/>
+              </View>
+            </SwiperItem>
+          </Swiper>
+        </View>
+
+        <AtNoticebar marquee>
+          这是 NoticeBar 通告栏，这是 NoticeBar 通告栏，这是 NoticeBar 通告栏
+        </AtNoticebar>
+
+        <View className='menu-nav' style={{paddingTop: '10px'}}>{menuitem}</View>
       </View>
     )
   }
